@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Evènements disponibles</h1>
+    <div class="list-group">
+        {% for event in event_list %}
+            <a href="{% url 'event' event.pk %}">{{ event.name }}</a>
+        {% endfor %}
+    </div>
+{% endblock %}

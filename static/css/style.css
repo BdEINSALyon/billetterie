@@ -1,0 +1,8 @@
+.navbar-brand .logo{
+    height: 1.5em;
+    display: inline-block;
+}
+
+#page-wrapper{
+    min-height: calc(100vh - 51px);
+}

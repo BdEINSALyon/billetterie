@@ -38,30 +38,6 @@ class SellLocation(models.Model):
         return self.name
 
 
-class Sell(models.Model):
-    class Meta:
-        verbose_name = _('Vente')
-
-    payment_methods = (
-        ('CB', _('Carte Bancaire')),
-        ('ESP', _('Espèces')),
-        ('CHQ', _('Chèque')),
-        ('VIR', _('Virement Bancaire')),
-    )
-    email = models.EmailField()
-    payment_method = models.CharField(max_length=3, choices=payment_methods)
-    location = models.ForeignKey(SellLocation, related_name='sells')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    refunded = models.BooleanField(default=False)
-
-    def id(self):
-        return "{}-{}".format(self.payment_method, self.pk)
-
-    def __str__(self):
-        return "Vente #{}".format(self.id())
-
-
 class Ticket(models.Model):
     class Meta:
         verbose_name = _('Billet')
@@ -71,12 +47,22 @@ class Ticket(models.Model):
         ('yurplan', 'Yurplan'),
         ('va', 'Carte VA')
     )
+
+    payment_methods = (
+        ('CB', _('Carte Bancaire')),
+        ('ESP', _('Espèces')),
+        ('CHQ', _('Chèque')),
+        ('VIR', _('Virement Bancaire')),
+    )
+
     entry = models.ForeignKey(Entry, verbose_name=_('Tarif'), related_name='tickets')
     email = models.EmailField()
+    payment_method = models.CharField(max_length=3, choices=payment_methods)
+    location = models.ForeignKey(SellLocation, related_name='sells')
+    canceled = models.BooleanField(default=False)
     ticket_type = models.CharField(max_length=50, choices=available_ticket_types)
     first_name = models.CharField(max_length=255, verbose_name=_('Prénom'))
     last_name = models.CharField(max_length=255, verbose_name=_('Nom'))
-    sell = models.ForeignKey(Sell, related_name='tickets')
 
     def id(self):
         return "{}-{}-{}".format(self.entry.event.pk, self.sell.pk, self.pk)
