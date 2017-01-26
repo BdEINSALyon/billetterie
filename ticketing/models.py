@@ -33,6 +33,7 @@ class SellLocation(models.Model):
     name = models.CharField(max_length=255)
     latitude = models.DecimalField(decimal_places=10, max_digits=13)
     longitude = models.DecimalField(decimal_places=10, max_digits=13)
+    events = models.ManyToManyField(Event, related_name='locations')
 
     def __str__(self):
         return self.name
