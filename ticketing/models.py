@@ -58,7 +58,7 @@ class Ticket(models.Model):
 
     entry = models.ForeignKey(Entry, verbose_name=_('Tarif'), related_name='tickets')
     email = models.EmailField()
-    payment_method = models.CharField(max_length=3, choices=payment_methods)
+    payment_method = models.CharField(max_length=3, choices=payment_methods, verbose_name=_('Méthode de paiement'), default='CB')
     location = models.ForeignKey(SellLocation, related_name='sells')
     canceled = models.BooleanField(default=False)
     ticket_type = models.CharField(max_length=50, choices=available_ticket_types)

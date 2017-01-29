@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block content %}
     <h1>{{ event.name }} - {{ location.name }}</h1>
-    <form method="post" class="form">
+    <form method="post" class="form" id="sell-ticket-form" data-event="{{ event.id }}" data-location="{{ location.id }}">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-6">
@@ -27,4 +28,8 @@
             </div>
         {% endbuttons %}
     </form>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'ticketing/js/sell_form.js' %}"></script>
 {% endblock %}
