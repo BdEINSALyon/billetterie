@@ -22,5 +22,5 @@ from ticketing import views as ticketing_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logout/$', logout),
-    url(r'^events/', include('ticketing.urls')),
+    url(r'^', include('ticketing.urls')),
 ]
