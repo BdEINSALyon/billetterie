@@ -21,6 +21,9 @@ class Entry(models.Model):
     price_ttc = models.DecimalField(verbose_name=_('Prix TTC'), decimal_places=2, max_digits=11)
     event = models.ForeignKey(Event, verbose_name=_('Evènement'), related_name='entries')
 
+    def full_name(self):
+        return '{} - {}€'.format(self.name, self.price_ttc)
+
     def __str__(self):
         return self.name
 
@@ -65,18 +68,18 @@ class Ticket(models.Model):
     first_name = models.CharField(max_length=255, verbose_name=_('Prénom'))
     last_name = models.CharField(max_length=255, verbose_name=_('Nom'))
 
-    def id(self):
-        return "{}-{}-{}".format(self.entry.event.pk, self.sell.pk, self.pk)
+    def full_id(self):
+        return "{}E{}L{}T".format(self.entry.event.pk, self.location.pk, self.pk)
 
     def __str__(self):
-        return "Ticket #{}".format(self.id())
+        return "Ticket #{}".format(self.full_id())
 
 
 class VALink(models.Model):
     class Meta:
         verbose_name = _('Carte VA')
 
-    ticket = models.ForeignKey(Ticket, related_name='va', limit_choices_to={'type': 'va'})
+    ticket = models.ForeignKey(Ticket, related_name='va', limit_choices_to={'ticket_type': 'va'})
     va_id = models.IntegerField(verbose_name=_('Numéro d\'adhérant'))
     card_id = models.CharField(max_length=15)
 
@@ -104,5 +107,5 @@ class Validation(models.Model):
     ticket = models.ForeignKey(Ticket, related_name='validation_entry')
 
     def __str__(self):
-        return "Validation #{}".format(self.ticket.id())
+        return "Validation #{}".format(self.ticket.full_id())
 
