@@ -1,6 +1,30 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 
 {% block content %}
     <h1>{{ event.name }} - {{ location.name }}</h1>
-    {{ form }}
+    <form method="post" class="form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                {% bootstrap_field form.va_id %}
+                {% bootstrap_field form.payment_method %}
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_field form.first_name %}
+                {% bootstrap_field form.last_name %}
+                {% bootstrap_field form.email %}
+            </div>
+        </div>
+
+        {% buttons %}
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <button type="submit" class="btn btn-block btn-primary">
+                        {% bootstrap_icon "star" %} Submit
+                    </button>
+                </div>
+            </div>
+        {% endbuttons %}
+    </form>
 {% endblock %}
