@@ -72,7 +72,14 @@ class SellTicket(TemplateView):
             # TODO: Send the ticket by email
             pass
 
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return super(SellTicket, self).get(request, **params)
+
+
+def list_participants(request, event):
+    event = models.Event.objects.get(pk=event)
+    return TemplateResponse(request, 'ticketing/participants/index.html', context={
+        'tickets': Ticket.objects.filter(entry__event=event)
+    })
 
 
 def check_va(request):
