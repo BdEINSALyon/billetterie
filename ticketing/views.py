@@ -105,6 +105,7 @@ def check_va(request):
             return HttpResponseNotFound(content_type='application/json')
         else:
             student = {key: api[key] for key in ['id', 'first_name', 'last_name', 'email']}
+            student['tickets'] = VALink.objects.filter(va_id=student['id']).count()
             return JsonResponse(student, content_type='application/json')
     else:
         return HttpResponseNotAllowed(permitted_methods=('POST',))

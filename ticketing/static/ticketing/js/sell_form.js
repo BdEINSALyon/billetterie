@@ -7,6 +7,9 @@ $(function () {
         if (e.keyCode == 13 && last_va_checked!=$(this).val()) {
             $form.addClass('loading-mask');
             $.post('/va/check', {code: $(this).val()}).done(function (result) {
+                if(result.tickets>0){
+                    alert('danger', 'La carte VA a déjà un billet lié');
+                }
                 $('#id_first_name').val(result.first_name);
                 $('#id_last_name').val(result.last_name);
                 $('#id_email').val(result.email);
