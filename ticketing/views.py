@@ -1,11 +1,15 @@
+from datetime import datetime
+
 from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 
 from ticketing import models
+from ticketing import security
 from ticketing.form import TicketForm
 from ticketing.marsu import MarsuAPI
 from ticketing.models import Ticket, Entry, VALink
@@ -54,13 +58,21 @@ class SellTicket(TemplateView):
         ticket.ticket_type = 'classic'
 
         if ticket.save() is not None:
-            return TemplateResponse(request, 'ticketing/failed.html')
+            return JsonResponse({
+                'success': False,
+                'reason': 'Le formulaire est mal remplis et ne permet pas de créer la place',
+                'type': 'va'
+            }, content_type='application/json')
 
         if request.POST['va_id'] != '':
             membership = MarsuAPI().get_va(request.POST['va_id'])
             if VALink.objects.filter(va_id=membership['id']).count() > 0:
                 ticket.delete()
-                return TemplateResponse(request, 'ticketing/already_used_va.html')
+                return JsonResponse({
+                    'success': False,
+                    'reason': 'La carte VA a déjà été utilisé pour une autre place !',
+                    'type': 'va'
+                }, content_type='application/json')
 
             va_link = VALink(ticket=ticket, card_id=request.POST['va_id'],
                              va_id=membership['id'])
@@ -72,7 +84,11 @@ class SellTicket(TemplateView):
             # TODO: Send the ticket by email
             pass
 
-        return super(SellTicket, self).get(request, **params)
+        return JsonResponse({
+            'success': True,
+            'ticket': '#{}'.format(ticket.full_id()),
+            'type': ticket.ticket_type
+        }, content_type='application/json')
 
 
 def list_participants(request, event):

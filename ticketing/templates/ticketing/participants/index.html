@@ -1,5 +1,5 @@
 {% extends 'ticketing/base.html' %}
-
+{% load bootstrap3 %}
 {% block content %}
     <h1>Liste des participants</h1>
     <table id="participants">
@@ -10,6 +10,7 @@
                 <th>Nom</th>
                 <th>Email</th>
                 <th>Type</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -20,6 +21,7 @@
                     <td>{{ ticket.last_name }}</td>
                     <td>{{ ticket.email }}</td>
                     <td>{{ ticket.ticket_type }}</td>
+                    <td><a href="{% url 'pdf_ticket' ticket.code %}" class="btn btn-primary">{% bootstrap_icon 'download' %} Télécharger</a></td>
                 </tr>
             {% endfor %}
 

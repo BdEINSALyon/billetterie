@@ -1,9 +1,31 @@
 <div class="navbar-default sidebar" role="navigation">
     <div class="sidebar-nav navbar-collapse">
         <ul class="nav" id="side-menu">
-            <li>
-                <a href="{% url 'events' %}"><i class="fa fa-cash fa-fw"></i> Ventes</a>
-            </li>
+            {% for event in events %}
+                <li>
+                    <a href="#"><i class="fa fa-ticket-o fa-fw"></i> {{ event.name }}<span
+                            class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="{% url 'list_participants' event.id %}">Participants</a>
+                        </li>
+                        <li>
+                            <a href="#">Billetteries <span class="fa arrow"></span></a>
+                            <ul class="nav nav-third-level">
+                                {% for location in event.locations.all %}
+                                    <li>
+                                        <a href="{% url 'event_sale' event=event.id location=location.id %}">
+                                            {{ location.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <!-- /.nav-third-level -->
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
+            {% endfor %}
         </ul>
     </div>
     <!-- /.sidebar-collapse -->

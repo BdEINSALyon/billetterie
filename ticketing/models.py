@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from ticketing import security
 
 
 class Event(models.Model):
@@ -7,6 +11,7 @@ class Event(models.Model):
         verbose_name = _('Evènement')
 
     name = models.CharField(max_length=255)
+    ticket_background = models.ImageField(verbose_name=_("Fond d'image tickets"), blank=True)
 
     def __str__(self):
         return self.name
@@ -70,6 +75,12 @@ class Ticket(models.Model):
 
     def full_id(self):
         return "{}E{}L{}T".format(self.entry.event.pk, self.location.pk, self.pk)
+
+    def code(self):
+        return security.encrypt({
+            'ticket': {'id': self.id},
+            'time': str(datetime.now())
+        })
 
     def __str__(self):
         return "Ticket #{}".format(self.full_id())
