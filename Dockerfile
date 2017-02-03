@@ -9,7 +9,7 @@ RUN apk add --no-cache python3 && \
     pip3 install --upgrade pip setuptools && \
     rm -r /root/.cache
 
-RUN apk add python3-dev postgresql-dev gcc musl-dev
+RUN apk add python3-dev postgresql-dev gcc musl-dev libxml2-dev libxslt-dev
 
 WORKDIR /app
 
@@ -20,5 +20,9 @@ COPY . /app
 VOLUME /app/staticfiles
 
 ENV DATABASE_URL postgres://postgresql:postgresql@db:5432/valet
+ENV MAILGUN_API_KEY ''
+ENV MARSU_APP_ID ''
+ENV MARSU_APP_SECRET ''
+
 RUN chmod +x /app/bash/run-prod.sh
 CMD /app/bash/run-prod.sh
