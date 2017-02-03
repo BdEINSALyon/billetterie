@@ -1,6 +1,9 @@
+import requests
 from django.contrib.auth import models as auth_models
 from account import models as account_models
 from django.db import models
+
+from account.providers import MicrosoftOAuthProvider
 
 
 class AzureGroup(models.Model):
@@ -9,10 +12,17 @@ class AzureGroup(models.Model):
     azure_id = models.CharField(max_length=100, choices=())
 
     def check_user(self, user):
-        for token in account_models.OAuthToken.objects.filter(user=user):
-            if token.service.name == 'microsoft':
-                # Check Key to microsoft
-                microsoft = token.service.provider
+        token = account_models.OAuthToken.objects.filter(user=user, service__name='microsoft').last()
+        result = requests.post(MicrosoftOAuthProvider.graph('/me/checkMemberGroups'), json={
+            'groupIds': [self.azure_id]
+        }, headers={
+            'Authorization': 'Bearer {}'.format(token.auth_token)
+        })
+        if result.status_code < 300 and self.azure_id in result.json()['value']:
+            user.groups.add(self.group)
+            return True
+        else:
+            return False
 
 
 class CheckLock(models.Model):

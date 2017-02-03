@@ -22,12 +22,12 @@ class Event(models.Model):
             return True
 
         # Check if user has not be locked for that group
-        if CheckLock.objects.filter(user=user, event=self, created_at__gte=datetime.now() - timedelta(hours=1)) > 0:
+        if CheckLock.objects.filter(user=user, event=self, created_at__gte=datetime.now() - timedelta(hours=1)).count() > 0:
             return False
 
         # Check the AzureGroup for that user
         for azure_group in AzureGroup.objects.filter(group__event=self):
-            if azure_group.check(user):
+            if azure_group.check_user(user):
                 return True
 
         # Disable check for one hour
