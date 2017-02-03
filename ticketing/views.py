@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from django.core.mail import EmailMultiAlternatives
 from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect, \
     HttpResponseForbidden
+from django.template import Template
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
@@ -77,9 +79,27 @@ class SellTicket(TemplateView):
 
             ticket.ticket_type = 'va'
             ticket.save()
-        else:
-            # TODO: Send the ticket by email
-            pass
+
+        msg = EmailMultiAlternatives("Votre billet pour {}".format(event.name),
+                                     "Ce billet n'est distribué qu'au format HTML",
+                                     "billetterie@mg.bde-insa-lyon.fr", [ticket.email])
+        message = TemplateResponse(request,
+                                   template='ticketing/email.html',
+                                   context={
+                                       'event': event,
+                                       'ticket': ticket,
+                                       'code': security.encrypt({
+                                           'ticket': {
+                                               'id': ticket.id
+                                           },
+                                           'time': str(datetime.now())
+                                       })
+                                   }).render()
+        message = message.content
+        message.replace(str.encode('type=3D"application/ld+json"'), str.encode('type="application/ld+json"'))
+        msg.attach_alternative(message, "text/html")
+
+        msg.send()
 
         return JsonResponse({
             'success': True,

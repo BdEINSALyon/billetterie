@@ -8,9 +8,11 @@ def events(request):
             if event.can_be_managed_by(request.user):
                 allowed_events.append(event)
         return {
-            'allowed_events': allowed_events
+            'allowed_events': allowed_events,
+            'website': request.scheme+'://'+request.get_host()
         }
     else:
         return {
-            'allowed_events': []
+            'allowed_events': [],
+            'website': request.scheme+'://'+request.get_host()
         }

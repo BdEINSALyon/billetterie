@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account',
+    'anymail',
+    'django_premailer',
     'permissions',
     'bootstrap3',
     'ticketing',
@@ -123,6 +125,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": os.environ.get('MAILGUN_API_KEY', ''),
+    "MAILGUN_SENDER_DOMAIN": os.environ.get('MAILGUN_DOMAIN', 'mg.bde-insa-lyon.fr'),
+}
+
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+DEFAULT_FROM_EMAIL = os.environ.get('MAILGUN_DOMAIN', "billetterie@mg.bde-insa-lyon.fr")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
