@@ -37,8 +37,8 @@ class SellTicket(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         event = models.Event.objects.get(pk=self.kwargs['event'])
-        if request.user is not None and not event.can_be_managed_by(request.user):
-            return HttpResponseForbidden()
+        if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
+            return HttpResponseRedirect('/')
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, event, location, **params):
@@ -93,6 +93,13 @@ def list_participants(request, event):
     return TemplateResponse(request, 'ticketing/participants/index.html', context={
         'tickets': Ticket.objects.filter(entry__event=event)
     })
+
+
+def welcome(request):
+    if request.user.is_anonymous():
+        return TemplateResponse(request, 'login.html')
+    else:
+        return TemplateResponse(request, 'ticketing/welcome.html')
 
 
 def check_va(request):

@@ -26,6 +26,5 @@ urlpatterns = [
     url(r'^logout/$', logout),
     url(r'^', include('ticketing.urls')),
     url(r'^', include('account.urls')),
-    url(r'^azureGroups$', list_azure_groups),
-    url(r'^$', TemplateView.as_view(template_name='base.html')),
+    url(r'^azureGroups$', list_azure_groups)
 ]
