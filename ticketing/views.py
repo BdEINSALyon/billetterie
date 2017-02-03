@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect
+from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect, \
+    HttpResponseForbidden
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
@@ -13,16 +14,6 @@ from ticketing import security
 from ticketing.form import TicketForm
 from ticketing.marsu import MarsuAPI
 from ticketing.models import Ticket, Entry, VALink
-
-
-class EventsList(ListView):
-    model = models.Event
-    template_name = 'ticketing/events.html'
-
-
-class EventView(DetailView):
-    model = models.Event
-    template_name = 'ticketing/event.html'
 
 
 class SellTicket(TemplateView):
@@ -43,6 +34,12 @@ class SellTicket(TemplateView):
         form = self.form()
         form.set_event(event)
         return form
+
+    def dispatch(self, request, *args, **kwargs):
+        event = models.Event.objects.get(pk=self.kwargs['event'])
+        if request.user is not None and not event.can_be_managed_by(request.user):
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, event, location, **params):
         event = models.Event.objects.get(pk=event)

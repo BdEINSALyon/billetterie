@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from django.contrib.auth.models import Group
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from permissions.models import CheckLock, AzureGroup
 from ticketing import security
 
 
@@ -12,6 +14,25 @@ class Event(models.Model):
 
     name = models.CharField(max_length=255)
     ticket_background = models.ImageField(verbose_name=_("Fond d'image tickets"), blank=True)
+    groups = models.ManyToManyField(Group)
+
+    def can_be_managed_by(self, user):
+        # Check if the user belongs to an authorized group
+        if self.groups.filter(user=user).count()>0:
+            return True
+
+        # Check if user has not be locked for that group
+        if CheckLock.objects.filter(user=user, event=self, created_at__gte=datetime.now() - timedelta(hours=1)) > 0:
+            return False
+
+        # Check the AzureGroup for that user
+        for azure_group in AzureGroup.objects.filter(group__event=self):
+            if azure_group.check(user):
+                return True
+
+        # Disable check for one hour
+        CheckLock(user=user, event=self).save()
+        return False
 
     def __str__(self):
         return self.name

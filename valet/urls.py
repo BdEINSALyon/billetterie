@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.contrib.auth.views import logout
 from django.views.generic import TemplateView
 
+from permissions.views import list_azure_groups
 from ticketing import views as ticketing_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logout/$', logout),
     url(r'^', include('ticketing.urls')),
+    url(r'^', include('account.urls')),
+    url(r'^azureGroups$', list_azure_groups),
     url(r'^$', TemplateView.as_view(template_name='base.html')),
 ]

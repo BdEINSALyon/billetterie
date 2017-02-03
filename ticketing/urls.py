@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from ticketing import pdf
-from ticketing.views import EventsList, EventView, SellTicket, check_va, list_participants
+from ticketing.views import SellTicket, check_va, list_participants
 
 urlpatterns = [
     url(r'^events/(?P<event>[0-9]+)/participants$', list_participants, name='list_participants'),
