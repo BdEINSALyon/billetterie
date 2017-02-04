@@ -11,6 +11,8 @@ RUN apk add --no-cache python3 && \
 
 RUN apk add python3-dev postgresql-dev gcc musl-dev libxml2-dev libxslt-dev
 RUN apk add --update --no-cache g++ gcc libxslt-dev==1.1.29-r0
+RUN apk add build-base jpeg-dev zlib-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
 
 WORKDIR /app
 
