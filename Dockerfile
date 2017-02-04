@@ -10,6 +10,7 @@ RUN apk add --no-cache python3 && \
     rm -r /root/.cache
 
 RUN apk add python3-dev postgresql-dev gcc musl-dev libxml2-dev libxslt-dev
+RUN apk add --update --no-cache g++ gcc libxslt-dev==1.1.29-r0
 
 WORKDIR /app
 
