@@ -2,32 +2,33 @@
 {% load bootstrap3 %}
 {% block content %}
     <h1>Liste des participants</h1>
-    <table id="participants">
+    <table id="participants" class="table table-bordered table-striped">
         <thead>
-            <tr>
-                <th>#</th>
-                <th>ID</th>
-                <th>Prénom</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Vendu le</th>
-                <th>Type</th>
-                <th></th>
-            </tr>
+        <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Vendu le</th>
+            <th>Type</th>
+            <th></th>
+        </tr>
         </thead>
         <tbody>
-            {% for ticket in tickets %}
-                <tr>
-                    <td>{{ ticket.id }}</td>
-                    <td>#{{ ticket.full_id }}</td>
-                    <td>{{ ticket.first_name }}</td>
-                    <td>{{ ticket.last_name }}</td>
-                    <td>{{ ticket.email }}</td>
-                    <td>{{ ticket.created_at }}</td>
-                    <td>{{ ticket.ticket_type }}</td>
-                    <td><a href="{% url 'pdf_ticket' ticket.code %}" class="btn btn-primary">{% bootstrap_icon 'download' %} Télécharger</a></td>
-                </tr>
-            {% endfor %}
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>#{{ ticket.full_id }}</td>
+                <td>{{ ticket.first_name }}</td>
+                <td>{{ ticket.last_name }}</td>
+                <td>{{ ticket.email }}</td>
+                <td>{{ ticket.created_at }}</td>
+                <td>{{ ticket.ticket_type }}</td>
+                <td><a href="{% url 'pdf_ticket' ticket.code %}" class="btn btn-primary">{% bootstrap_icon 'download' %}
+                    Télécharger</a></td>
+            </tr>
+        {% endfor %}
 
 
         </tbody>
@@ -36,8 +37,11 @@
 
 {% block javascript %}
     <script>
-        $(document).ready(function() {
-            $('#participants').DataTable();
-        } );
+        $(document).ready(function () {
+            var table = $('#participants').DataTable({
+                "order": [[0, "desc"]]
+            });
+            table.column(0).data().sort().reverse();
+        });
     </script>
 {% endblock %}
