@@ -27,7 +27,7 @@ SECRET_KEY = 'n&=x+j^n@a2@ufe#vn=$%a7s70oc8m-3&jf-^^!i4v7&8!jp-_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'valet.bde-insa-lyon.fr']
+ALLOWED_HOSTS = [os.environ.get('HOST', 'localhost'), 'billetterie.bde-insa-lyon.fr']
 
 MARSU_APP_ID = os.environ.get('MARSU_APP_ID', '')
 MARSU_APP_SECRET = os.environ.get('MARSU_APP_SECRET', '')
