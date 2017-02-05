@@ -6,9 +6,11 @@
         <thead>
             <tr>
                 <th>#</th>
+                <th>ID</th>
                 <th>Prénom</th>
                 <th>Nom</th>
                 <th>Email</th>
+                <th>Vendu le</th>
                 <th>Type</th>
                 <th></th>
             </tr>
@@ -16,10 +18,12 @@
         <tbody>
             {% for ticket in tickets %}
                 <tr>
-                    <td>{{ ticket.full_id }}</td>
+                    <td>{{ ticket.id }}</td>
+                    <td>#{{ ticket.full_id }}</td>
                     <td>{{ ticket.first_name }}</td>
                     <td>{{ ticket.last_name }}</td>
                     <td>{{ ticket.email }}</td>
+                    <td>{{ ticket.created_at }}</td>
                     <td>{{ ticket.ticket_type }}</td>
                     <td><a href="{% url 'pdf_ticket' ticket.code %}" class="btn btn-primary">{% bootstrap_icon 'download' %} Télécharger</a></td>
                 </tr>
