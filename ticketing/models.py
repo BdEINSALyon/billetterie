@@ -93,6 +93,7 @@ class Ticket(models.Model):
     ticket_type = models.CharField(max_length=50, choices=available_ticket_types)
     first_name = models.CharField(max_length=255, verbose_name=_('Prénom'))
     last_name = models.CharField(max_length=255, verbose_name=_('Nom'))
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def full_id(self):
         return "{}E{}L{}T".format(self.entry.event.pk, self.location.pk, self.pk)

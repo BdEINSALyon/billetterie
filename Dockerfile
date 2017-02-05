@@ -1,17 +1,9 @@
-FROM alpine
+FROM python:3.5
 
 EXPOSE 8000
-RUN apk update
 
-RUN apk add --no-cache python3 && \
-    python3 -m ensurepip && \
-    rm -r /usr/lib/python*/ensurepip && \
-    pip3 install --upgrade pip setuptools && \
-    rm -r /root/.cache
-
-RUN apk add python3-dev postgresql-dev gcc musl-dev libxml2-dev libxslt-dev
-RUN apk add --update --no-cache g++ gcc libxslt-dev==1.1.29-r0
-RUN apk add build-base jpeg-dev zlib-dev
+RUN apt-get update
+RUN apt-get install -y libpq-dev python-dev gcc g++ libxslt-dev libtiff5-dev libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
 ENV LIBRARY_PATH=/lib:/usr/lib
 
 WORKDIR /app

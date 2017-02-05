@@ -412,8 +412,7 @@
                                                             <table border="0" cellpadding="0" cellspacing="0">
                                                                 <tbody>
                                                                 <tr>
-                                                                    <td><a href="{{ request.scheme }}://
-                                                                            {{ request.get_host }}{% url 'pdf_ticket' code %}"
+                                                                    <td><a href="{% url 'pdf_ticket' code %}"
                                                                            target="_blank">Télécharger mon billet</a></td>
                                                                 </tr>
                                                                 </tbody>
@@ -444,6 +443,7 @@
                         </table>
                     </div>
 
+                <!-- {{ website }} -->
                     <!-- END FOOTER -->
 
                     <!-- END CENTERED WHITE CONTAINER --></div>

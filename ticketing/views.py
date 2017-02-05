@@ -65,6 +65,13 @@ class SellTicket(TemplateView):
 
         if request.POST['va_id'] != '':
             membership = MarsuAPI().get_va(request.POST['va_id'])
+            if 'id' not in membership:
+                ticket.delete()
+                return JsonResponse({
+                    'success': False,
+                    'reason': 'La carte VA n\'existe pas ou n\'a pas été activé',
+                    'type': 'va'
+                }, content_type='application/json')
             if VALink.objects.filter(va_id=membership['id']).count() > 0:
                 ticket.delete()
                 return JsonResponse({
@@ -81,7 +88,7 @@ class SellTicket(TemplateView):
             ticket.save()
 
         msg = EmailMultiAlternatives("Votre billet pour {}".format(event.name),
-                                     "Ce billet n'est distribué qu'au format HTML",
+                                     "Ce billet est distribué qu'au format HTML",
                                      "billetterie@mg.bde-insa-lyon.fr", [ticket.email])
         message = TemplateResponse(request,
                                    template='ticketing/email.html',
@@ -95,8 +102,6 @@ class SellTicket(TemplateView):
                                            'time': str(datetime.now())
                                        })
                                    }).render()
-        message = message.content
-        message.replace(str.encode('type=3D"application/ld+json"'), str.encode('type="application/ld+json"'))
         msg.attach_alternative(message, "text/html")
 
         msg.send()
