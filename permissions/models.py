@@ -13,6 +13,8 @@ class AzureGroup(models.Model):
 
     def check_user(self, user):
         token = account_models.OAuthToken.objects.filter(user=user, service__name='microsoft').last()
+        if token is None:
+            return False
         result = requests.post(MicrosoftOAuthProvider.graph('/me/checkMemberGroups'), json={
             'groupIds': [self.azure_id]
         }, headers={
