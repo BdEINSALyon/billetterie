@@ -1,7 +1,8 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Count
 from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect, \
     HttpResponseForbidden
 from django.template import Template
@@ -157,4 +158,62 @@ def yurplan_webhook(request):
         return HttpResponseNotAllowed(permitted_methods=('POST',))
 
 
-
+def valethon(request, event):
+    if request.method == 'GET':
+        event = Event.objects.get(id=event)
+        sold_tickets = Ticket.objects.filter(entry__event=event, canceled=False).count()
+        sales_opening_period = (event.sales_closing - event.sales_opening).days
+        days_of_sales = sales_opening_period - event.closed_days_count or 1
+        stats = {'sold_tickets': sold_tickets, 'left_tickets': event.max_seats - sold_tickets,
+                 'fill': sold_tickets / event.max_seats * 100,
+                 'left_tickets_by_days': (event.max_seats - sold_tickets) /
+                                         (
+                                             days_of_sales
+                                         ),
+                 'sales': []}
+        for entry in event.entries.all():
+            stats['sales'].append({
+                'name': entry.name,
+                'sold_tickets': entry.tickets.count()
+            })
+        stats['by_day'] = []
+        locations = event.locations.all()
+        for i in range(0, sales_opening_period + 1):
+            sales_of_day = Ticket.objects.filter(entry__event=event, canceled=False,
+                                                 created_at__gte=event.sales_opening.date() + timedelta(days=i),
+                                                 created_at__lte=event.sales_opening.date() + timedelta(days=i + 1)
+                                                 ).count()
+            sales_at_this_day = Ticket.objects.filter(entry__event=event, canceled=False,
+                                                      created_at__gte=event.sales_opening.date(),
+                                                      created_at__lte=event.sales_opening.date() + timedelta(days=i + 1)
+                                                      ).count()
+            sales_of_day = {
+                'day': event.sales_opening.date() + timedelta(days=i),
+                'sales': sales_of_day,
+                'at_this_day': sales_at_this_day,
+                'by_location': []
+            }
+            for location in locations:
+                sales_of_day['by_location'].append({
+                    'sales': Ticket.objects.filter(entry__event=event, canceled=False,
+                                                   created_at__gte=event.sales_opening.date() + timedelta(days=i),
+                                                   created_at__lte=event.sales_opening.date() + timedelta(days=i + 1),
+                                                   location=location
+                                                   ).count()
+                })
+            sales_of_day['by_location'].append({
+                'sales': Ticket.objects.filter(entry__event=event, canceled=False,
+                                               created_at__gte=event.sales_opening.date() + timedelta(days=i),
+                                               created_at__lte=event.sales_opening.date() + timedelta(days=i + 1),
+                                               location=None
+                                               ).count()
+            })
+            stats['by_day'].append(sales_of_day)
+        return TemplateResponse(request, 'ticketing/participants/valethon.html', context={
+            'stats': stats,
+            'now': datetime.now,
+            'event': event,
+            'locations': locations
+        })
+    else:
+        return HttpResponseNotAllowed(permitted_methods=('GET',))

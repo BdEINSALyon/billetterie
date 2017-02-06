@@ -17,6 +17,11 @@ class Event(models.Model):
     ticket_background = models.ImageField(verbose_name=_("Fond d'image tickets"), blank=True)
     groups = models.ManyToManyField(Group)
     yurplan_event_id = models.IntegerField(blank=True, null=True)
+    sales_opening = models.DateTimeField(default=datetime.now)
+    sales_closing = models.DateTimeField(default=datetime.now)
+    max_seats = models.IntegerField(default=1600, verbose_name=_('Nombre maximal de place'))
+    seats_goal = models.IntegerField(default=1600)
+    closed_days_count = models.IntegerField(default=13)
 
     def can_be_managed_by(self, user):
         # Check if the user belongs to an authorized group
@@ -76,6 +81,7 @@ class Entry(models.Model):
     price_ttc = models.DecimalField(verbose_name=_('Prix TTC'), decimal_places=2, max_digits=11)
     event = models.ForeignKey(Event, verbose_name=_('Evènement'), related_name='entries')
     yurplan_id = models.IntegerField(blank=True, null=True)
+    max_seats = models.IntegerField(default=1600, verbose_name=_('Nombre maximal de place'))
 
     def full_name(self):
         return '{} - {}€'.format(self.name, self.price_ttc)

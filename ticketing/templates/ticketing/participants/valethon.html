@@ -1,0 +1,139 @@
+{% extends 'ticketing/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+    <h1>Valethon</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default text-center">
+                        <div class="panel-heading text-capitalize">{{ now | date:'l j F' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Places vendues</div>
+                        <div class="panel-body text-center">
+                            {{ stats.sold_tickets }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Restant à vendre</div>
+                        <div class="panel-body text-center">
+                            {{ stats.left_tickets }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Remplissage</div>
+                        <div class="panel-body text-center">
+                            {{ stats.fill | floatformat:2 }}%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">A vendre par jour</div>
+                        <div class="panel-body text-center">
+                            {{ stats.left_tickets_by_days | floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="sales_by_entry"></div>
+        </div>
+        <div class="col-md-12">
+            <div id="sales_by_day"></div>
+        </div>
+
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Jour</th>
+                        {% for location in locations %}
+                            <th>{{ location.name }}</th>
+                        {% endfor %}
+                        <th>Yurplan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sales in stats.by_day %}
+                        {% if sales.day <= now.date %}
+                        <tr>
+                            <td>{{ sales.day | date:'l j F' }}</td>
+                            {% for sales_loc in sales.by_location %}
+                                <td>{{ sales_loc.sales }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Tarif');
+        data.addColumn('number', 'Ventes');
+        data.addRows([
+            {% for sale in stats.sales %}
+                ['{{ sale.name }}', {{sale.sold_tickets}}],
+            {% endfor %}
+        ]);
+
+        // Set chart options
+        var options = {'title':'Répartition des place/tarifs', height: 300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('sales_by_entry'));
+        chart.draw(data, options);
+
+        data = new google.visualization.DataTable();
+        data.addColumn('date', 'Jour');
+        data.addColumn('number', 'Ventes');
+        data.addRows([
+            {% for sale in stats.by_day %}
+                [new Date({{ sale.day.year }}, {{ sale.day.month }}, {{ sale.day.day }}), {{sale.at_this_day}}],
+            {% endfor %}
+        ]);
+
+        options = {
+          title: 'Ventes cumulées',
+          hAxis: {title: 'Jours',  titleTextStyle: {color: '#333'},
+
+            format: 'd/M/yy',
+            gridlines: {count: 7}
+          },
+          vAxis: {minValue: 0, maxValue: {{event.max_seats}}},
+            height: 500
+        };
+
+        var chart = new google.visualization.AreaChart(document.getElementById('sales_by_day'));
+        chart.draw(data, options);
+      }
+      $(window).resize(drawChart);
+    </script>
+{% endblock %}
