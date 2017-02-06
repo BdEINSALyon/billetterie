@@ -9,10 +9,12 @@ $(function () {
             $.post('/va/check', {code: $(this).val()}).done(function (result) {
                 if(result.tickets>0){
                     alert('danger', 'La carte VA a déjà un billet lié');
+                    $form.find("input[type=text], textarea").val("");
+                } else {
+                    $('#id_first_name').val(result.first_name);
+                    $('#id_last_name').val(result.last_name);
+                    $('#id_email').val(result.email);
                 }
-                $('#id_first_name').val(result.first_name);
-                $('#id_last_name').val(result.last_name);
-                $('#id_email').val(result.email);
             }).always(function () {
                 $form.removeClass('loading-mask');
             });
@@ -20,6 +22,24 @@ $(function () {
             last_va_checked = $(this).val();
         }
     });
+
+    var check_va_selling = function(){
+        $form.find("input[type=text], textarea").val("");
+        var mode = $form.find('input[type="radio"][name="entry"]:checked').data('selling')
+        var $va = $form.find('input[name="va_id"]');
+        if(mode == 'va_only') {
+            $va.attr('required', true);
+        } else {
+            $va.removeAttr('required');
+        }
+        if(mode == 'no_va') {
+            $va.closest('.form-group').hide();
+        } else {
+            $va.closest('.form-group').show();
+        }
+    };
+    check_va_selling();
+    $form.find('input[type="radio"][name="entry"]').change(check_va_selling);
 
     function alert(type, message){
         $form.find('.alerts').html(

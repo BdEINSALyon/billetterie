@@ -1,7 +1,22 @@
-from django.forms import ModelForm, CharField, ChoiceField, CheckboxInput, ModelChoiceField, RadioSelect
+from django.forms import ModelForm, CharField, ChoiceField, CheckboxInput, ModelChoiceField, RadioSelect, widgets
 from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from ticketing.models import Ticket, Event
+from ticketing.models import Ticket, Event, Entry
+
+
+class EntryRadioChoiceInput(widgets.RadioChoiceInput):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        entry = Entry.objects.get(pk=self.choice_value)
+        self.attrs['data-selling'] = entry.selling_mode
+
+
+class MyRadioFieldRenderer(widgets.ChoiceFieldRenderer):
+    choice_input_class = EntryRadioChoiceInput
+
+
+class EntryRadioSelect(RadioSelect):
+    renderer = MyRadioFieldRenderer
 
 
 class TicketForm(ModelForm):
@@ -15,7 +30,7 @@ class TicketForm(ModelForm):
         super().__init__(data, files, auto_id, prefix, initial, error_class, label_suffix, empty_permitted, instance,
                          use_required_attribute)
 
-    entry = ChoiceField(label=_('Tarif'), required=True, widget=RadioSelect)
+    entry = ChoiceField(label=_('Tarif'), required=True, widget=EntryRadioSelect)
     va_id = CharField(max_length=15, label=_('Carte VA'), required=False)
 
     def set_event(self, event):

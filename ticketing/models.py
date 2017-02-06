@@ -82,6 +82,11 @@ class Entry(models.Model):
     event = models.ForeignKey(Event, verbose_name=_('Evènement'), related_name='entries')
     yurplan_id = models.IntegerField(blank=True, null=True)
     max_seats = models.IntegerField(default=1600, verbose_name=_('Nombre maximal de place'))
+    selling_mode = models.CharField(max_length=20, choices=(
+        ('va_only', 'Que pour des membre VA'),
+        ('no_va', 'Ne doit pas être VA'),
+        ('whatever', 'Qu\'importe')
+    ), default='whatever')
 
     def full_name(self):
         return '{} - {}€'.format(self.name, self.price_ttc)
