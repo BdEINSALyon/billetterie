@@ -134,6 +134,12 @@
         var chart = new google.visualization.AreaChart(document.getElementById('sales_by_day'));
         chart.draw(data, options);
       }
-      $(window).resize(drawChart);
+      $(function () {
+
+        $(window).resize(drawChart);
+        setTimeout(function () {
+            window.location.reload();
+        }, 20*1000)
+      })
     </script>
 {% endblock %}
