@@ -1,0 +1,74 @@
+{% extends 'ticketing/base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block content %}
+    <h1>Vérification des billets - {{ event.name }}</h1>
+    <form method="post" class="form" id="check-ticket-form" data-event="{{ event.id }}" data-location="{{ location.id }}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12 alerts"></div>
+            <div class="col-md-12">
+                {% bootstrap_field form.ticket_barre_code %}
+            </div>
+        </div>
+
+        {% buttons %}
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <button type="submit" class="btn btn-block btn-primary">
+                         Valider
+                    </button>
+                </div>
+            </div>
+        {% endbuttons %}
+    </form>
+    <h4>Validation manuelle</h4>
+    <table id="participants" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Vendu le</th>
+            <th>Type</th>
+            <th>Entrée Possible</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>#{{ ticket.full_id }}</td>
+                <td>{{ ticket.first_name }}</td>
+                <td>{{ ticket.last_name }}</td>
+                <td>{{ ticket.email }}</td>
+                <td>{{ ticket.created_at }}</td>
+                <td>{{ ticket.ticket_type }}</td>
+                <td>{% if ticket.used %}<i class="text-danger glyphicon glyphicon-remove"></i>{% else %}<i class="text-success glyphicon glyphicon-ok"></i>{% endif %} </td>
+                <td>
+                    {% if not ticket.used %}
+                    <a href="#" data-code="{{ ticket.code }}" class="code-input btn btn-primary">{% bootstrap_icon 'ok' %}
+                    Valider</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'ticketing/js/check.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#participants').DataTable({
+                "order": [[0, "desc"]]
+            });
+            table.column(0).data().sort().reverse();
+        });
+    </script>
+{% endblock %}

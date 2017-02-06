@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import Group
@@ -7,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from permissions.models import CheckLock, AzureGroup
 from ticketing import security
 from ticketing import yurplan
+from ticketing.marsu import MarsuAPI
 
 
 class Event(models.Model):
@@ -151,6 +153,46 @@ class Ticket(models.Model):
             'ticket': {'id': self.id},
             'time': str(datetime.now())
         })
+
+    def used(self):
+        return self.validation_entry.count() > 0
+
+    def check_entry(self):
+        if not self.used():
+            Validation(ticket=self).save()
+            if self.ticket_type == 'yurplan':
+                yurplan.ApiClient().check_ticket(self.entry.event.yurplan_event_id, self.yurplan.last().token)
+
+    def uncheck_entry(self):
+        if self.used():
+            Validation.objects.filter(ticket=self).delete()
+            if self.ticket_type == 'yurplan':
+                yurplan.ApiClient().uncheck_ticket(self.entry.event.yurplan_event_id, self.yurplan.last().token)
+
+    @staticmethod
+    def find_for_code(code):
+        yp = re.compile(r'^[0-9]+$')
+        if yp.fullmatch(code):
+            try:
+                return YurplanLink.objects.get(token=code).ticket or None
+            except YurplanLink.DoesNotExist:
+                return None
+        va = re.compile(r'^c[0-9]{12}$')
+        if va.fullmatch(code):
+            membership = MarsuAPI().get_va(code)
+            if 'id' not in membership:
+                return None
+            try:
+                return VALink.objects.get(va_id=membership['id']).ticket or None
+            except VALink.DoesNotExist:
+                return None
+
+        code = security.decrypt(code)
+
+        try:
+            return Ticket.objects.get(pk=code['ticket']['id']) or None
+        except Ticket.DoesNotExist:
+            return None
 
     def __str__(self):
         return "Ticket #{}".format(self.full_id())

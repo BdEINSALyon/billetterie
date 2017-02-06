@@ -1,4 +1,4 @@
-from django.forms import ModelForm, CharField, ChoiceField, CheckboxInput, ModelChoiceField, RadioSelect, widgets
+from django.forms import ModelForm, CharField, ChoiceField, CheckboxInput, ModelChoiceField, RadioSelect, widgets, Form
 from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from ticketing.models import Ticket, Event, Entry
@@ -36,3 +36,8 @@ class TicketForm(ModelForm):
     def set_event(self, event):
         self.fields['entry'].choices = [(entry.pk, entry.full_name()) for entry in event.entries.all()]
         self.fields['entry'].initial = event.entries.first().pk
+
+
+class CheckForm(Form):
+
+    ticket_barre_code = CharField(max_length=1500, label=_('Code barre'))

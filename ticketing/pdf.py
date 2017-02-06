@@ -17,7 +17,7 @@ def generate_ticket(request, code, **params):
     data = security.decrypt(code)
     ticket = Ticket.objects.get(id=data['ticket']['id'])
     data['time'] = str(datetime.now())
-    qr_code = qr.QrCodeWidget(ticket.full_id()+'+'+security.encrypt(data))
+    qr_code = qr.QrCodeWidget(ticket.code())
 
     # Create the HttpResponse object with the appropriate PDF headers.
     response = HttpResponse(content_type='application/pdf')

@@ -6,7 +6,8 @@ from django.template.response import TemplateResponse
 from ticketing import pdf
 from ticketing import security
 from ticketing.models import Ticket
-from ticketing.views import SellTicket, check_va, list_participants, welcome, yurplan_webhook, valethon
+from ticketing.views import SellTicket, check_va, list_participants, welcome, yurplan_webhook, valethon, \
+    check_participant
 
 
 def generate_email(request, code):
@@ -29,6 +30,7 @@ def generate_email(request, code):
 urlpatterns = [
     url(r'^events/(?P<event>[0-9]+)/participants$', list_participants, name='list_participants'),
     url(r'^events/(?P<event>[0-9]+)/valethon$', valethon, name='valethon'),
+    url(r'^events/(?P<event>[0-9]+)/check', check_participant, name='check_participants'),
     url(r'^events/(?P<event>[0-9]+)/selling/(?P<location>[0-9]+)', SellTicket.as_view(), name='event_sale'),
     url(r'^print/(?P<code>[A-Za-z0-9=+]+)', pdf.generate_ticket, name='pdf_ticket'),
     url(r'^email/(?P<code>[A-Za-z0-9=+]+)', generate_email, name='email'),

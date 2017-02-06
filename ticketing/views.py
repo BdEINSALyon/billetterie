@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 from django.core.mail import EmailMultiAlternatives
+from django.db import models
 from django.db.models import Count
 from django.http.response import JsonResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseRedirect, \
     HttpResponseForbidden
@@ -13,12 +14,11 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 
-from ticketing import models
 from ticketing import security
 from ticketing import yurplan
-from ticketing.form import TicketForm
+from ticketing.form import TicketForm, CheckForm
 from ticketing.marsu import MarsuAPI
-from ticketing.models import Ticket, Entry, VALink, Event, YurplanLink
+from ticketing.models import Ticket, Entry, VALink, Event, YurplanLink, SellLocation
 
 
 class SellTicket(TemplateView):
@@ -27,8 +27,8 @@ class SellTicket(TemplateView):
     http_method_names = ('get', 'post')
 
     def get_context_data(self, **kwargs):
-        event = models.Event.objects.get(pk=self.kwargs['event'])
-        location = models.SellLocation.objects.get(pk=self.kwargs['location'])
+        event = Event.objects.get(pk=self.kwargs['event'])
+        location = SellLocation.objects.get(pk=self.kwargs['location'])
         data = {'event': event,
                 'location': location,
                 'form': self.get_form(event)}
@@ -41,14 +41,14 @@ class SellTicket(TemplateView):
         return form
 
     def dispatch(self, request, *args, **kwargs):
-        event = models.Event.objects.get(pk=self.kwargs['event'])
+        event = Event.objects.get(pk=self.kwargs['event'])
         if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
             return HttpResponseRedirect('/')
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, event, location, **params):
-        event = models.Event.objects.get(pk=event)
-        location = models.SellLocation.objects.get(pk=location)
+        event = Event.objects.get(pk=event)
+        location = SellLocation.objects.get(pk=location)
 
         ticket = Ticket()
         ticket.entry = Entry.objects.get(id=request.POST['entry'])
@@ -117,7 +117,9 @@ class SellTicket(TemplateView):
 
 
 def list_participants(request, event):
-    event = models.Event.objects.get(pk=event)
+    event = Event.objects.get(pk=event)
+    if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
+        return HttpResponseRedirect('/')
     return TemplateResponse(request, 'ticketing/participants/index.html', context={
         'tickets': Ticket.objects.filter(entry__event=event)
     })
@@ -161,6 +163,8 @@ def yurplan_webhook(request):
 def valethon(request, event):
     if request.method == 'GET':
         event = Event.objects.get(id=event)
+        if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
+            return HttpResponseRedirect('/')
         sold_tickets = Ticket.objects.filter(entry__event=event, canceled=False).count()
         sales_opening_period = (event.sales_closing - event.sales_opening).days
         days_of_sales = sales_opening_period - event.closed_days_count or 1
@@ -217,3 +221,35 @@ def valethon(request, event):
         })
     else:
         return HttpResponseNotAllowed(permitted_methods=('GET',))
+
+
+def check_participant(request, event):
+    event = Event.objects.get(pk=event)
+    if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
+        return HttpResponseRedirect('/')
+    if request.method == 'GET':
+        return TemplateResponse(request, template='ticketing/check/check.html', context={
+            'form': CheckForm(),
+            'tickets': Ticket.objects.filter(entry__event=event, canceled=False),
+            'event': event
+        })
+    if request.method == 'POST':
+        code = request.POST['ticket_barre_code']
+        ticket = Ticket.find_for_code(code)
+        if ticket is None:
+            return TemplateResponse(request, template='ticketing/check/ko.html', context={
+                'reason': 'Aucun billet pour cette personne dans la base.',
+                'event': event
+            })
+        if ticket.used():
+            return TemplateResponse(request, template='ticketing/check/ko.html', context={
+                'reason': 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at),
+                'event': event
+            })
+        ticket.check_entry()
+        return TemplateResponse(request, template='ticketing/check/ok.html', context={
+            'event': event
+        })
+
+
+
