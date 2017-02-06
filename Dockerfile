@@ -18,6 +18,8 @@ ENV DATABASE_URL postgres://postgresql:postgresql@db:5432/valet
 ENV MAILGUN_API_KEY ''
 ENV MARSU_APP_ID ''
 ENV MARSU_APP_SECRET ''
+ENV YURPLAN_APP_ID ''
+ENV YURPLAN_APP_SECRET ''
 
 RUN chmod +x /app/bash/run-prod.sh
 CMD /app/bash/run-prod.sh

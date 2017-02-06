@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.core.mail import EmailMultiAlternatives
@@ -13,9 +14,10 @@ from django.views.generic import TemplateView
 
 from ticketing import models
 from ticketing import security
+from ticketing import yurplan
 from ticketing.form import TicketForm
 from ticketing.marsu import MarsuAPI
-from ticketing.models import Ticket, Entry, VALink
+from ticketing.models import Ticket, Entry, VALink, Event, YurplanLink
 
 
 class SellTicket(TemplateView):
@@ -138,3 +140,21 @@ def check_va(request):
             return JsonResponse(student, content_type='application/json')
     else:
         return HttpResponseNotAllowed(permitted_methods=('POST',))
+
+
+@csrf_exempt
+def yurplan_webhook(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        if not data['is_test']:
+            event = Event.objects.filter(yurplan_event_id=data['event_id']).last()
+            if event is not None:
+                yurplan_order = data['reference']
+                event.load_yurplan_order(yurplan_order)
+                return JsonResponse({'success': True, 'data': data}, content_type='application/json')
+        return JsonResponse({'success': False, 'data': data}, content_type='application/json')
+    else:
+        return HttpResponseNotAllowed(permitted_methods=('POST',))
+
+
+

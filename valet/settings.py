@@ -144,3 +144,6 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+
+YURPLAN_APP_ID = os.environ.get('YURPLAN_APP_ID', '')
+YURPLAN_APP_SECRET = os.environ.get('YURPLAN_APP_SECRET', '')
