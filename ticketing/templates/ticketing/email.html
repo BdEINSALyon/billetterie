@@ -15,7 +15,7 @@
             }
 
             body {
-                background-color: #f6f6f6;
+                background-color: #3C121C;
                 font-family: sans-serif;
                 -webkit-font-smoothing: antialiased;
                 font-size: 14px;
@@ -24,6 +24,7 @@
                 padding: 0;
                 -ms-text-size-adjust: 100%;
                 -webkit-text-size-adjust: 100%;
+                height: 100%;
             }
 
             table {
@@ -44,7 +45,7 @@
             ------------------------------------- */
 
             .body {
-                background-color: #f6f6f6;
+                background-color: #3C121C;
                 width: 100%;
             }
 
@@ -72,7 +73,7 @@
             ------------------------------------- */
             .main {
                 background: #fff;
-                border-radius: 3px;
+                border-radius: 8px;
                 width: 100%;
             }
 
@@ -108,7 +109,7 @@
                 font-family: sans-serif;
                 font-weight: 400;
                 line-height: 1.4;
-                margin: 0;
+                Margin-top: 10px;
                 Margin-bottom: 30px;
             }
 
@@ -180,12 +181,12 @@
             }
 
             .btn-primary table td {
-                background-color: #3498db;
+                background-color: #3C121C;
             }
 
             .btn-primary a {
-                background-color: #3498db;
-                border-color: #3498db;
+                background-color: #6d1928;
+                border-color: #6d1928;
                 color: #ffffff;
             }
 
@@ -394,21 +395,21 @@
                                     <tr>
                                         <td>
                                             <div style="text-align: center; margin: 30px;">
-                                                <img src="http://logos.bde-insa-lyon.fr/bde/bde.png" height="70px">
+                                                <img src="http://logos.bde-insa-lyon.fr/bal/Logo_bal.png" height="120px">
                                             </div>
-                                            <p>Bonjour,</p>
-                                            <p>Merci pour votre achat de billet pour
+                                            <p class="align-center">Bonjour {{ ticket.first_name }},</p>
+                                            <p class="align-center">Merci pour votre achat de billet pour
                                                 l'événement {{ ticket.entry.event }}</p>
                                             {% if ticket.ticket_type == 'va' %}
-                                                <p>Votre carte VA vous servira de billet pour entrer ou récupérer un bracelet d'accès</p>
-                                                <p>Vous avez le billet #{{ ticket.full_id }}</p>
+                                                <p class="align-center"><b>Votre carte VA</b> vous servira de billet pour entrer ou récupérer un bracelet d'accès</p>
+                                                <p class="align-center">Vous avez le billet <b>#{{ ticket.full_id }}</b></p>
                                             {% else %}
-                                                <p>Vous avez le billet #{{ ticket.full_id }}</p>
-                                                <p>Nous vous avons généré votre billet, vous pouvez le télécharger ici :</p>
+                                                <p class="align-center">Vous avez le billet <b>#{{ ticket.full_id }}</b></p>
+                                                <p class="align-center">Nous vous avons généré votre billet, vous pouvez le télécharger ici :</p>
                                                 <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                                                     <tbody>
                                                     <tr>
-                                                        <td align="left">
+                                                        <td align="center">
                                                             <table border="0" cellpadding="0" cellspacing="0">
                                                                 <tbody>
                                                                 <tr>
@@ -422,7 +423,25 @@
                                                     </tbody>
                                                 </table>
                                             {% endif %}
-                                            <p>A très bientôt !</p>
+                                            <h2  class="align-center">Informations importantes</h2>
+                                            <p class="align-center">Ouverture des portes&nbsp;: 22h00</p>
+                                            <p class="align-center">Dernière entrée&nbsp;: <b>02h30</b></p>
+                                            <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td align="center">
+                                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                                <tbody>
+                                                                <tr>
+                                                                    <td><a href="http://bal.bde-insa-lyon.fr"
+                                                                           target="_blank">Plus d'informations</a></td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
                                         </td>
                                     </tr>
                                 </table>
@@ -437,7 +456,11 @@
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td class="content-block">
-                                    <span class="apple-link">BdE INSA Lyon, 18 avenue des Arts, 69100 Villeurbanne</span>
+                                    <span class="apple-link">Ce mail vous a été envoyé par</span><br>
+                                    <span class="apple-link">BdE INSA Lyon, 18 avenue des Arts, 69100 Villeurbanne</span><br>
+                                    <span class="apple-link">car vous avez acheter un billet pour un événement</span><br><br>
+                                    <span class="apple-link"><a href="http://bde.insa-lyon.org" target="__blank">http://bde.insa-lyon.org</a></span><br>
+
                                 </td>
                             </tr>
                         </table>
