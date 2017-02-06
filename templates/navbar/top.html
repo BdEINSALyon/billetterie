@@ -1,12 +1,14 @@
 <ul class="nav navbar-top-links navbar-right">
-    <li class="dropdown">
+    <li>
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-user fa-fw"></i> {{ user.email }} <i class="fa fa-caret-down"></i>
+            <i class="fa fa-user fa-fw"></i> {{ user.email }}
         </a>
-        <ul class="dropdown-menu dropdown-user">
-            <li><a href="/logout/?next=/"><i class="fa fa-sign-out fa-fw"></i> Déconnexion</a>
+        {% if user.is_staff %}
+            <li><a href="/admin"><i class="fa fa-gear fa-fw"></i></a>
             </li>
-        </ul>
+        {% endif %}
+        <li><a href="/logout/?next=/"><i class="text-danger fa fa-sign-out fa-fw"></i></a>
+        </li>
         <!-- /.dropdown-user -->
     </li>
     <!-- /.dropdown -->

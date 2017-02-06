@@ -90,9 +90,9 @@ class SellTicket(TemplateView):
             ticket.ticket_type = 'va'
             ticket.save()
 
-        msg = EmailMultiAlternatives("Votre billet pour {}".format(event.name),
+        msg = EmailMultiAlternatives("Votre billet pour le {}".format(event.name),
                                      "Ce billet est distribué qu'au format HTML",
-                                     "billetterie@mg.bde-insa-lyon.fr", [ticket.email])
+                                     "BdE INSA Lyon <billetterie@mg.bde-insa-lyon.fr>", [ticket.email])
         message = TemplateResponse(request,
                                    template='ticketing/email.html',
                                    context={
