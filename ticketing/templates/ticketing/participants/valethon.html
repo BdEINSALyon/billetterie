@@ -1,5 +1,11 @@
 {% extends 'ticketing/base.html' %}
 {% load bootstrap3 %}
+{% load static %}
+
+{% block style %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'ticketing/css/style.css' %}">
+{% endblock style %}
 {% block content %}
     <h1>Valethon</h1>
     <div class="row">
@@ -7,38 +13,38 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-default text-center">
-                        <div class="panel-heading text-capitalize">{{ now | date:'l j F' }}</div>
+                        <div class="panel-heading text-capitalize"><h4>{{ now | date:'l j F' }}</h4></div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">Places vendues</div>
+                        <div class="panel-heading"><h4>Places vendues</h4></div>
                         <div class="panel-body text-center">
-                            {{ stats.sold_tickets }}
+                            <span class="valethon-value">{{ stats.sold_tickets }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">Restant à vendre</div>
+                        <div class="panel-heading"><h4>Restant à vendre</h4></div>
                         <div class="panel-body text-center">
-                            {{ stats.left_tickets }}
+                            <span class="valethon-value">{{ stats.left_tickets }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">Remplissage</div>
+                        <div class="panel-heading"><h4>Remplissage</h4></div>
                         <div class="panel-body text-center">
-                            {{ stats.fill | floatformat:2 }}%
+                            <span class="valethon-value">{{ stats.fill | floatformat:2 }}%</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading">A vendre par jour</div>
+                        <div class="panel-heading"><h4>A vendre par jour</h4></div>
                         <div class="panel-body text-center">
-                            {{ stats.left_tickets_by_days | floatformat:0 }}
+                            <span class="valethon-value">{{ stats.left_tickets_by_days | floatformat:0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -136,10 +142,10 @@
       }
       $(function () {
 
-        $(window).resize(drawChart);
-        setTimeout(function () {
-            window.location.reload();
-        }, 20*1000)
+{#        $(window).resize(drawChart);#}
+{#        setTimeout(function () {#}
+{#            window.location.reload();#}
+{#        }, 20*1000)#}
       })
     </script>
 {% endblock %}
