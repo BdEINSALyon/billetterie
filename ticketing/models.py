@@ -169,10 +169,10 @@ class YurplanLink(models.Model):
                                                                                            'constituant le code bare du'
                                                                                            ' billet YurPlan'))
     yurplan_ticket_id = models.IntegerField(verbose_name=_('Identifiant du billet'))
-    ticket = models.ForeignKey(Ticket, related_name='yurplan', limit_choices_to={'type': 'yurplan'})
+    ticket = models.ForeignKey(Ticket, related_name='yurplan', limit_choices_to={'ticket_type': 'yurplan'})
 
     def __str__(self):
-        return self.yurplan_id
+        return "{} - {}".format(self.order_reference, self.yurplan_ticket_id)
 
 
 class Validation(models.Model):
