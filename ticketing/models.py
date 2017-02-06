@@ -24,6 +24,17 @@ class Event(models.Model):
     max_seats = models.IntegerField(default=1600, verbose_name=_('Nombre maximal de place'))
     seats_goal = models.IntegerField(default=1600)
     closed_days_count = models.IntegerField(default=13)
+    logo_url = models.CharField(max_length=2500, default='http://logos.bde-insa-lyon.fr/bal/Logo_bal.png', blank=True, null=True)
+    email_background_color = models.CharField(max_length=7, default='#3C121C')
+    email_button_color = models.CharField(max_length=7, default='#6D1928')
+    email_more_info_link = models.CharField(max_length=2500, default='http://bal.bde-insa-lyon.fr', blank=True, null=True)
+    email_important_information_html = models.TextField(default='<h2  class="align-center">Informations importantes'
+                                                                '</h2>'
+                                                                '<p class="align-center">Ouverture des portes&nbsp;: '
+                                                                '22h00</p>'
+                                                                '<p class="align-center">Dernière '
+                                                                'entrée&nbsp;: <b>02h30</b></p>',
+                                                                blank=True, null=True)
 
     def can_be_managed_by(self, user):
         # Check if the user belongs to an authorized group

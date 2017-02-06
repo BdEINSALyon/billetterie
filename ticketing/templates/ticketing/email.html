@@ -15,7 +15,7 @@
             }
 
             body {
-                background-color: #3C121C;
+                background-color: {{ event.email_background_color }};
                 font-family: sans-serif;
                 -webkit-font-smoothing: antialiased;
                 font-size: 14px;
@@ -45,7 +45,7 @@
             ------------------------------------- */
 
             .body {
-                background-color: #3C121C;
+                background-color: {{ event.email_background_color }};
                 width: 100%;
             }
 
@@ -185,8 +185,8 @@
             }
 
             .btn-primary a {
-                background-color: #6d1928;
-                border-color: #6d1928;
+                background-color: {{ event.email_button_color }};
+                border-color: {{ event.email_button_color }};
                 color: #ffffff;
             }
 
@@ -340,44 +340,6 @@
         </style>
     </head>
     <body class="">
-    <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
-      "@type": "EventReservation",
-      "reservationNumber": "{{ ticket.full_id }}",
-      "reservationStatus": "http://schema.org/Confirmed",
-      "underName": {
-        "@type": "Person",
-        "name": "{{ ticket.first_name }} {{ ticket.last_name }}"
-      },
-      "reservationFor": {
-        "@type": "Event",
-        "name": "{{ event.name }}",
-        "startDate": "2017-03-03T22:00:00+01:00",
-        "endDate": "2017-03-04T05:00:00+01:00",
-        "doorTime": "2017-03-04T02:30:00+01:00",
-        "location": {
-          "@type": "Place",
-          "name": "Le Transbordeur",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "3 Boulevard de Stalingrad",
-            "addressLocality": "Villeurbanne",
-            "postalCode": "69100",
-            "addressCountry": "FR"
-          }
-        }
-      },
-      "ticketToken": "qrCode:{{ ticket.full_id }}+{{ ticket.code }}",
-      "ticketNumber": "{{ ticket.full_id }}",
-      "ticketDownloadUrl": "{{ request.scheme }}://{{ request.get_host }}{% url 'pdf_ticket' code %}",
-      "numSeats": "1",
-      "price": "{{ ticket.entry.price_ttc }}",
-      "priceCurrency":"EUR"
-    }
-
-    </script>
-
     <table border="0" cellpadding="0" cellspacing="0" class="body">
         <tr>
             <td>&nbsp;</td>
@@ -385,7 +347,6 @@
                 <div class="content">
 
                     <!-- START CENTERED WHITE CONTAINER -->
-                    <span class="preheader">Votre achat de billets pour un événement BdE INSA Lyon</span>
                     <table class="main">
 
                         <!-- START MAIN CONTENT AREA -->
@@ -395,7 +356,7 @@
                                     <tr>
                                         <td>
                                             <div style="text-align: center; margin: 30px;">
-                                                <img src="http://logos.bde-insa-lyon.fr/bal/Logo_bal.png" height="120px">
+                                                <img src="{{ event.logo_url }}" height="120px">
                                             </div>
                                             <p class="align-center">Bonjour {{ ticket.first_name }},</p>
                                             <p class="align-center">Merci pour votre achat de billet pour
@@ -423,9 +384,8 @@
                                                     </tbody>
                                                 </table>
                                             {% endif %}
-                                            <h2  class="align-center">Informations importantes</h2>
-                                            <p class="align-center">Ouverture des portes&nbsp;: 22h00</p>
-                                            <p class="align-center">Dernière entrée&nbsp;: <b>02h30</b></p>
+                                            {{ event.email_important_information_html|safe }}
+                                            {% if event.email_more_info_link %}
                                             <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                                                     <tbody>
                                                     <tr>
@@ -433,7 +393,7 @@
                                                             <table border="0" cellpadding="0" cellspacing="0">
                                                                 <tbody>
                                                                 <tr>
-                                                                    <td><a href="http://bal.bde-insa-lyon.fr"
+                                                                    <td><a href="{{ event.email_more_info_link }}"
                                                                            target="_blank">Plus d'informations</a></td>
                                                                 </tr>
                                                                 </tbody>
@@ -442,6 +402,7 @@
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 </table>
