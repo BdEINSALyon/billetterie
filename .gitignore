@@ -136,3 +136,4 @@ ENV/
 
 
 staticfiles
+.venv-valet
