@@ -38,6 +38,15 @@ class TicketForm(ModelForm):
         self.fields['entry'].initial = event.entries.first().pk
 
 
+class TicketVaSwapForm(ModelForm):
+
+    class Meta:
+        model = Ticket
+        fields = ('va_id', 'first_name', 'last_name', 'email')
+
+    va_id = CharField(max_length=15, label=_('Carte VA'), required=True)
+
+
 class CheckForm(Form):
 
     ticket_barre_code = CharField(max_length=1500, label=_('Code barre'))

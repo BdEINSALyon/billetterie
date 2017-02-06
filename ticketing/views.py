@@ -252,4 +252,42 @@ def check_participant(request, event):
         })
 
 
-
+def ticket_va_swap(request, event, ticket):
+    event = Event.objects.get(pk=event)
+    if request.user.is_anonymous() or not event.can_be_managed_by(request.user) or not request.user.is_staff:
+        return HttpResponseRedirect('/')
+    ticket = Ticket.objects.get(pk=ticket, entry__event=event)
+    ticket_form = TicketForm()
+    if request.method == 'GET':
+        return TemplateResponse(request, template='ticketing/participants/ticket_va_swap.html', context={
+            'form': ticket_form,
+            'ticket': ticket,
+            'event': event
+        })
+    if request.method == 'POST':
+        membership = MarsuAPI().get_va(request.POST['va_id'])
+        if 'id' not in membership:
+            return JsonResponse({
+                'success': False,
+                'reason': 'La carte VA n\'existe pas ou n\'a pas été activé',
+                'type': 'va'
+            }, content_type='application/json')
+        if VALink.objects.filter(va_id=membership['id']).count() > 0:
+            return JsonResponse({
+                'success': False,
+                'reason': 'La carte VA a déjà été utilisé pour une autre place !',
+                'type': 'va'
+            }, content_type='application/json')
+        ticket.va.last().delete()
+        va_link = VALink(ticket=ticket, card_id=request.POST['va_id'],
+                         va_id=membership['id'])
+        va_link.save()
+        ticket.first_name = request.POST['first_name']
+        ticket.last_name = request.POST['last_name']
+        ticket.email = request.POST['email']
+        ticket.save()
+        return JsonResponse({
+            'success': True,
+            'ticket': '#{}'.format(ticket.full_id()),
+            'type': ticket.ticket_type
+        }, content_type='application/json')

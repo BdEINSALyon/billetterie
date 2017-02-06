@@ -42,13 +42,17 @@ $(function () {
     $form.find('input[type="radio"][name="entry"]').change(check_va_selling);
 
     function alert(type, message){
-        $form.find('.alerts').html(
+        $('.alerts').html(
             '<div class="alert alert-'+type+'">'+'' +
             '<a class="close" data-dismiss="alert">×</a>'+
             '<span>' + message + '</span>'+
             '</div>');
         setTimeout(function(){
-            $form.find('.alerts').html('');
+            $('.alerts').html('');
+            if($('.swap').length>0){
+                window.history.forward();
+                window.location.reload();
+            }
         }, 5000)
     }
 
@@ -68,6 +72,7 @@ $(function () {
                     } else {
                         alert('success', 'Vente enregistrée, le billet a été envoyé par email.');
                     }
+                    $('.swap').hide();
                     $form[0].reset();
                     $form.find("select").focus();
                 } else {

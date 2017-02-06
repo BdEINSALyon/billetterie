@@ -26,7 +26,12 @@
                 <td>{{ ticket.created_at }}</td>
                 <td>{{ ticket.ticket_type }}</td>
                 <td><a href="{% url 'pdf_ticket' ticket.code %}" class="btn btn-primary">{% bootstrap_icon 'download' %}
-                    Télécharger</a></td>
+                    Télécharger</a>
+                {% if ticket.ticket_type == 'va' and user.is_staff %}
+                    <a href="{% url 'ticket_swap' ticket.entry.event.id ticket.id %}" class="btn btn-primary">{% bootstrap_icon 'random' %}
+                    Swap</a>
+                {% endif %}
+                </td>
             </tr>
         {% endfor %}
 
