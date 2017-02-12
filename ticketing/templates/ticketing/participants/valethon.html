@@ -122,7 +122,7 @@
         data.addColumn('number', 'Ventes');
         data.addRows([
             {% for sale in stats.by_day %}
-                [new Date({{ sale.day.year }}, {{ sale.day.month }}, {{ sale.day.day }}), {{sale.at_this_day}}],
+                [new Date({{ sale.day.year }}, {{ sale.day.month|add:"-1" }}, {{ sale.day.day }}), {{sale.at_this_day}}],
             {% endfor %}
         ]);
 
