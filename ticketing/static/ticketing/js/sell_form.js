@@ -4,7 +4,11 @@ $(function () {
 
     var last_va_checked = "";
     $form.find('#id_va_id').keydown(function (e) {
-        if (e.keyCode == 13 && last_va_checked!=$(this).val()) {
+        if (e.keyCode === 13) {
+            if(last_va_checked!==$(this).val()){
+                last_va_checked = "";
+                return;
+            }
             $form.addClass('loading-mask');
             $.post('/va/check', {code: $(this).val()}).done(function (result) {
                 if(result.tickets>0){
