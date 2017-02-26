@@ -1,7 +1,6 @@
 {% extends 'ticketing/base.html' %}
 {% load bootstrap3 %}
 {% load static %}
-{% load table_tags %}
 
 {% block content %}
     <h1>Vérification des billets - {{ event.name }}</h1>
@@ -21,15 +20,24 @@
                          Valider
                     </button>
                 </div>
+                <div class="col-md-2 col-md-offset-1">
+                    <a href="{% url 'check_participants' event.id %}" class="btn btn-block btn-warning">
+                        Recherche manuelle
+                    </a>
+                </div>
             </div>
         {% endbuttons %}
     </form>
-    {% if tickets %}
-    <h4>Validation manuelle</h4>
-    {% render_table tickets %}
-    {% endif %}
 {% endblock %}
 
 {% block javascript %}
     <script src="{% static 'ticketing/js/check.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var table = $('#participants').DataTable({
+                "order": [[0, "desc"]]
+            });
+            table.column(0).data().sort().reverse();
+        });
+    </script>
 {% endblock %}

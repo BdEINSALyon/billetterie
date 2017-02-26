@@ -1,5 +1,8 @@
+from _md5 import md5
+
 import re
 from datetime import datetime, timedelta
+from django.conf import settings
 
 from django.contrib.auth.models import Group
 from django.db import models
@@ -180,6 +183,9 @@ class Ticket(models.Model):
             if self.ticket_type == 'yurplan':
                 yurplan.ApiClient().uncheck_ticket(self.entry.event.yurplan_event_id, self.yurplan.last().token)
 
+    def security_hash(self):
+        return md5(str(settings.SECRET_KEY+self.full_id()).encode()).hexdigest()
+
     @staticmethod
     def find_for_code(code):
         yp = re.compile(r'^[0-9]+$')
@@ -196,6 +202,18 @@ class Ticket(models.Model):
             try:
                 return VALink.objects.get(va_id=membership['id']).ticket or None
             except VALink.DoesNotExist:
+                return None
+        ss = re.compile(r'^s-[A-Za-z0-9]*-[0-9]*$')
+        if ss.fullmatch(code):
+            data = str(code).split('-', 3)
+            try:
+                ticket = Ticket.objects.get(pk=data[2])
+                if ticket is None:
+                    return None
+                if data[1] != ticket.security_hash():
+                    return None
+                return ticket or None
+            except Ticket.DoesNotExist:
                 return None
 
         code = security.decrypt(code)

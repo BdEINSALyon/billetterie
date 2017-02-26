@@ -5,7 +5,9 @@
 {% block content %}
     <h1>Vérification des billets - {{ event.name }}</h1>
     <div class="text-center" style="font-size: 300px; color: #6d1928; line-height: 1"><i class="glyphicon glyphicon-remove"></i></div>
-    <h2 class="text-center text-danger">{{ reason }}</h2>
+    <h2 class="text-center text-danger">
+        {% if ticket %}{{ ticket.first_name }} {{ ticket.last_name }} : {% endif %}Entrée refusée</h2>
+    <h2 class="text-center text-danger">Raison : {{ reason }}</h2>
     <div style="margin-top: 2em">
         <a href="{% url check_url event.id %}" class="btn btn-success">Valider une autre personne</a>
     </div>

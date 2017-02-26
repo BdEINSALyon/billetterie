@@ -18,7 +18,8 @@ from ticketing import security
 from ticketing import yurplan
 from ticketing.form import TicketForm, CheckForm
 from ticketing.marsu import MarsuAPI
-from ticketing.models import Ticket, Entry, VALink, Event, YurplanLink, SellLocation
+from ticketing.models import Ticket, Entry, VALink, Event, YurplanLink, SellLocation, Validation
+from ticketing.tables import TicketsTable
 
 
 class SellTicket(TemplateView):
@@ -228,28 +229,45 @@ def check_light_participant(request, event):
     if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
         return HttpResponseRedirect('/')
     if request.method == 'GET':
-        return TemplateResponse(request, template='ticketing/check/check.html', context={
+        return TemplateResponse(request, template='ticketing/check/check_light.html', context={
             'form': CheckForm(),
             'event': event
         })
     if request.method == 'POST':
-        code = request.POST['ticket_barre_code']
-        ticket = Ticket.find_for_code(code)
-        if ticket is None:
-            return TemplateResponse(request, template='ticketing/check/ko.html', context={
-                'reason': 'Aucun billet pour cette personne dans la base.',
-                'check_url': 'check_light_participant',
-                'event': event
-            })
-        if ticket.used():
-            return TemplateResponse(request, template='ticketing/check/ko.html', context={
-                'reason': 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at),
-                'check_url': 'check_light_participant',
-                'event': event
-            })
+        return validate_entry(request)
+
+
+def validate_entry(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect(request.get_raw_uri())
+    code = request.POST['ticket_barre_code']
+    ticket = Ticket.find_for_code(code)
+    if ticket is None:
+        return TemplateResponse(request, template='ticketing/check/ko.html', context={
+            'reason': 'Ce billet n\'existe pas !',
+            'ticket': ticket,
+            'check_url': request.resolver_match.url_name,
+            'event': Event.objects.get(pk=request.resolver_match.kwargs['event'])
+        })
+    event = ticket.entry.event
+    rejected_reason = None
+    if ticket is None:
+        rejected_reason = 'Aucun billet pour cette personne dans la base.'
+    if ticket.used():
+        rejected_reason = 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at)
+
+    if rejected_reason is not None:
+        return TemplateResponse(request, template='ticketing/check/ko.html', context={
+            'reason': rejected_reason,
+            'ticket': ticket,
+            'check_url': request.resolver_match.url_name,
+            'event': event
+        })
+    else:
         ticket.check_entry()
         return TemplateResponse(request, template='ticketing/check/ok.html', context={
-            'check_url': 'check_light_participant',
+            'check_url': request.resolver_match.url_name,
+            'ticket': ticket,
             'event': event
         })
 
@@ -259,31 +277,19 @@ def check_participant(request, event):
     if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
         return HttpResponseRedirect('/')
     if request.method == 'GET':
+        ###
+        #all_tickets = Ticket.objects.filter(entry__event=event, canceled=False)
+        #validations = [v.ticket_id for v in Validation.objects.filter(ticket__entry__event=event)]
+        #tickets = []
+        #for t in all_tickets:
+        #    tickets.append((t, t.id in validations))
         return TemplateResponse(request, template='ticketing/check/check.html', context={
             'form': CheckForm(),
-            'tickets': Ticket.objects.filter(entry__event=event, canceled=False),
+            'tickets': TicketsTable(),
             'event': event
         })
     if request.method == 'POST':
-        code = request.POST['ticket_barre_code']
-        ticket = Ticket.find_for_code(code)
-        if ticket is None:
-            return TemplateResponse(request, template='ticketing/check/ko.html', context={
-                'reason': 'Aucun billet pour cette personne dans la base.',
-                'check_url': 'check_participant',
-                'event': event
-            })
-        if ticket.used():
-            return TemplateResponse(request, template='ticketing/check/ko.html', context={
-                'reason': 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at),
-                'event': event,
-                'check_url': 'check_participant'
-            })
-        ticket.check_entry()
-        return TemplateResponse(request, template='ticketing/check/ok.html', context={
-            'check_url': 'check_light_participant',
-            'event': event
-        })
+        return validate_entry(request)
 
 
 def ticket_va_swap(request, event, ticket):

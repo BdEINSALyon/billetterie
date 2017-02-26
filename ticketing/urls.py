@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.template.response import TemplateResponse
 
 from ticketing import pdf
@@ -30,13 +30,14 @@ def generate_email(request, code):
 urlpatterns = [
     url(r'^events/(?P<event>[0-9]+)/participants$', list_participants, name='list_participants'),
     url(r'^events/(?P<event>[0-9]+)/valethon$', valethon, name='valethon'),
-    url(r'^events/(?P<event>[0-9]+)/check', check_participant, name='check_participants'),
-    url(r'^events/(?P<event>[0-9]+)/check_light', check_light_participant, name='check_light_participants'),
+    url(r'^events/(?P<event>[0-9]+)/check$', check_participant, name='check_participants'),
+    url(r'^events/(?P<event>[0-9]+)/check_light$', check_light_participant, name='check_light_participants'),
     url(r'^events/(?P<event>[0-9]+)/swap/va/(?P<ticket>[0-9]+)', ticket_va_swap, name='ticket_swap'),
     url(r'^events/(?P<event>[0-9]+)/selling/(?P<location>[0-9]+)', SellTicket.as_view(), name='event_sale'),
     url(r'^print/(?P<code>[A-Za-z0-9=+]+)', pdf.generate_ticket, name='pdf_ticket'),
     url(r'^email/(?P<code>[A-Za-z0-9=+]+)', generate_email, name='email'),
     url(r'^va/check', check_va, name='check_va'),
     url(r'^$', welcome, name='welcome'),
-    url(r'^webhook/yurplan$', yurplan_webhook)
+    url(r'^webhook/yurplan$', yurplan_webhook),
+    url(r'^table/', include('table.urls'))
 ]

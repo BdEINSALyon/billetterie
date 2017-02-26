@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Vérification des billets - {{ event.name }}</h1>
     <div class="text-center" style="font-size: 300px; color: #3d8b3d"><i class="glyphicon glyphicon-ok"></i></div>
-    <h2 class="text-center text-success">La personne est autorisée</h2>
+    <h2 class="text-center text-danger">{{ ticket.first_name }} {{ ticket.last_name }} : Entrée autorisée</h2>
     <div style="margin-top: 2em">
         <a href="{% url check_url event.id %}" class="btn btn-success">Valider une autre personne</a>
     </div>
