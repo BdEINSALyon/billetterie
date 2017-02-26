@@ -223,6 +223,37 @@ def valethon(request, event):
         return HttpResponseNotAllowed(permitted_methods=('GET',))
 
 
+def check_light_participant(request, event):
+    event = Event.objects.get(pk=event)
+    if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
+        return HttpResponseRedirect('/')
+    if request.method == 'GET':
+        return TemplateResponse(request, template='ticketing/check/check.html', context={
+            'form': CheckForm(),
+            'event': event
+        })
+    if request.method == 'POST':
+        code = request.POST['ticket_barre_code']
+        ticket = Ticket.find_for_code(code)
+        if ticket is None:
+            return TemplateResponse(request, template='ticketing/check/ko.html', context={
+                'reason': 'Aucun billet pour cette personne dans la base.',
+                'check_url': 'check_light_participant',
+                'event': event
+            })
+        if ticket.used():
+            return TemplateResponse(request, template='ticketing/check/ko.html', context={
+                'reason': 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at),
+                'check_url': 'check_light_participant',
+                'event': event
+            })
+        ticket.check_entry()
+        return TemplateResponse(request, template='ticketing/check/ok.html', context={
+            'check_url': 'check_light_participant',
+            'event': event
+        })
+
+
 def check_participant(request, event):
     event = Event.objects.get(pk=event)
     if request.user.is_anonymous() or not event.can_be_managed_by(request.user):
@@ -239,15 +270,18 @@ def check_participant(request, event):
         if ticket is None:
             return TemplateResponse(request, template='ticketing/check/ko.html', context={
                 'reason': 'Aucun billet pour cette personne dans la base.',
+                'check_url': 'check_participant',
                 'event': event
             })
         if ticket.used():
             return TemplateResponse(request, template='ticketing/check/ko.html', context={
                 'reason': 'Le billet a été utilisé le {} (GMT).'.format(ticket.validation_entry.last().created_at),
-                'event': event
+                'event': event,
+                'check_url': 'check_participant'
             })
         ticket.check_entry()
         return TemplateResponse(request, template='ticketing/check/ok.html', context={
+            'check_url': 'check_light_participant',
             'event': event
         })
 

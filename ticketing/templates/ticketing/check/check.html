@@ -23,6 +23,7 @@
             </div>
         {% endbuttons %}
     </form>
+    {% if tickets %}
     <h4>Validation manuelle</h4>
     <table id="participants" class="table table-bordered table-striped">
         <thead>
@@ -59,6 +60,7 @@
 
         </tbody>
     </table>
+    {% endif %}
 {% endblock %}
 
 {% block javascript %}
