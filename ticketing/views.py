@@ -192,10 +192,16 @@ def valethon(request, event):
                                                       created_at__gte=event.sales_opening.date(),
                                                       created_at__lte=event.sales_opening.date() + timedelta(days=i + 1)
                                                       ).count()
+            validations_at_this_day = Validation.objects.filter(ticket__entry__event=event, ticket__canceled=False,
+                                                                created_at__gte=event.sales_opening.date(),
+                                                                created_at__lte=event.sales_opening.date() + timedelta(
+                                                                    days=i + 1)
+                                                                ).count()
             sales_of_day = {
                 'day': event.sales_opening.date() + timedelta(days=i),
                 'sales': sales_of_day,
                 'at_this_day': sales_at_this_day,
+                'validation_at_this_day': validations_at_this_day,
                 'by_location': []
             }
             for location in locations:
@@ -278,10 +284,10 @@ def check_participant(request, event):
         return HttpResponseRedirect('/')
     if request.method == 'GET':
         ###
-        #all_tickets = Ticket.objects.filter(entry__event=event, canceled=False)
-        #validations = [v.ticket_id for v in Validation.objects.filter(ticket__entry__event=event)]
-        #tickets = []
-        #for t in all_tickets:
+        # all_tickets = Ticket.objects.filter(entry__event=event, canceled=False)
+        # validations = [v.ticket_id for v in Validation.objects.filter(ticket__entry__event=event)]
+        # tickets = []
+        # for t in all_tickets:
         #    tickets.append((t, t.id in validations))
         return TemplateResponse(request, template='ticketing/check/check.html', context={
             'form': CheckForm(),

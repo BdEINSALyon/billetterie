@@ -66,6 +66,7 @@
                             <th>{{ location.name }}</th>
                         {% endfor %}
                         <th>Yurplan</th>
+                        <th style="background: #BBB">Entrées</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,6 +77,7 @@
                             {% for sales_loc in sales.by_location %}
                                 <td>{{ sales_loc.sales }}</td>
                             {% endfor %}
+                            <td style="background: #BBB">{{ sales.validation_at_this_day }}</td>
                         </tr>
                         {% endif %}
                     {% endfor %}
