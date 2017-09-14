@@ -24,7 +24,7 @@ from ticketing import views as ticketing_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logout/$', logout),
-    url(r'^', include('ticketing.urls')),
+    url(r'^backend/', include('ticketing.urls')),
     url(r'^', include('account.urls')),
     url(r'^azureGroups$', list_azure_groups)
 ]
