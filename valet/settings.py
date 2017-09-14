@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'permissions',
     'bootstrap3',
     'ticketing',
+    'billetterie',
 ]
 
 MIDDLEWARE = [

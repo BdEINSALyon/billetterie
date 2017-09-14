@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logout/$', logout),
     url(r'^backend/', include('ticketing.urls')),
+    url(r'^', include('billetterie.urls')),
     url(r'^', include('account.urls')),
     url(r'^azureGroups$', list_azure_groups)
 ]
